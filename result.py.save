@@ -1,0 +1,181 @@
+import argparse
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.io import loadmat
+
+
+def load_mat_numeric_1d(mat_path: Path, preferred_keys=None) -> np.ndarray:
+    """
+    .mat から「1次元の数値配列」をなるべく自動で取り出す。
+    - preferred_keys があればその順で探す
+    - なければ '__' 以外のキーで「数値配列っぽいもの」を探して採用
+    """
+    d = loadmat(mat_path, squeeze_me=True, struct_as_record=False)
+    keys = [k for k in d.keys() if not k.startswith("__")]
+
+    def as_1d(a):
+        a = np.asarray(a)
+        if a.dtype.kind not in "iuf":  # int/uint/float 以外は除外
+            return None
+        a = a.reshape(-1).astype(float)
+        a = a[np.isfinite(a)]
+        return a
+
+    # 1) preferred_keys を優先
+    if preferred_keys:
+        for k in preferred_keys:
+            if k in d:
+                arr = as_1d(d[k])
+                if arr is not None and arr.size > 0:
+                    return arr
+
+    # 2) 自動探索：一番長い数値ベクトルを選ぶ（ラベルは短いので後で別ルールも可）
+    candidates = []
+    for k in keys:
+        arr = as_1d(d[k])
+        if arr is not None and arr.size > 0:
+            candidates.append((k, arr))
+
+    if not candidates:
+        raise RuntimeError(
+            f"{mat_path.name} に数値配列が見つかりませんでした。\n"
+            f"MAT keys: {keys}"
+        )
+
+    # いったん最長を採用（SAT/RR向け）。LABELSは短いので別でpreferred_keys使うのがおすすめ
+    candidates.sort(key=lambda x: x[1].size, reverse=True)
+    chosen_key, chosen_arr = candidates[0]
+    print(f"[INFO] {mat_path.name}: auto-picked key = '{chosen_key}', len = {chosen_arr.size}")
+    return chosen_arr
+
+
+def rr_to_hr_per_min(rr_ms: np.ndarray, n_minutes: int) -> np.ndarray:
+    """
+    RR間隔(ms)列 -> 分ごとの平均心拍(bpm)
+    - RRを積算して拍時刻を作る
+    - instantaneous HR = 60000/RR
+    - minute binごとに平均
+    """
+    rr_ms = rr_ms.astype(float)
+    rr_ms = rr_ms[(rr_ms > 200) & (rr_ms < 3000)]  # 雑な外れ値除外
+
+    if rr_ms.size < 10:
+        return np.full(n_minutes, np.nan)
+
+    t_sec = np.cumsum(rr_ms) / 1000.0
+    hr_inst = 60000.0 / rr_ms
+    minute_idx = (t_sec // 60).astype(int)
+
+    df = pd.DataFrame({"minute": minute_idx, "hr": hr_inst})
+    hr_min = df.groupby("minute")["hr"].mean()
+
+    out = np.full(n_minutes, np.nan)
+    for m, v in hr_min.items():
+        if 0 <= m < n_minutes:
+            out[m] = v
+    return out
+
+
+def series_to_per_min_mean(x: np.ndarray, n_minutes: int) -> np.ndarray:
+    """
+    連続系列 x を n_minutes に分割して分ごとの平均にする。
+    - ちょうど割り切れるなら reshape して高速＆正確
+    - 割り切れないなら array_split で均等割
+    """
+    x = np.asarray(x, dtype=float)
+    if x.size < n_minutes:
+        return np.full(n_minutes, np.nan)
+
+    if x.size % n_minutes == 0:
+        m = x.size // n_minutes
+        return np.nanmean(x.reshape(n_minutes, m), axis=1)
+
+    # 50Hzや1Hzなどでも微妙に端数が出ることがあるので、均等割りで平均
+    chunks = np.array_split(x, n_minutes)
+    return np.array([np.nanmean(c) if c.size else np.nan for c in chunks], dtype=float)
+
+
+def normalize_labels(labels: np.ndarray) -> np.ndarray:
+    """
+    ラベルを 0/1 に揃える
+    - -1/1 -> 0/1
+    - 0/1 -> そのまま
+    - その他 -> >0 を1扱い
+    """
+    y = np.asarray(labels).reshape(-1)
+
+    uniq = set(np.unique(y))
+    if uniq.issubset({-1, 1}):
+        y = ((y + 1) // 2).astype(int)
+    elif uniq.issubset({0, 1}):
+        y = y.astype(int)
+    else:
+        y = (y > 0).astype(int)
+    return y
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--root", required=True, help="HuGCDN2014-OXI のパス（LABELS/SAT/RRがある場所）")
+    ap.add_argument("--subject", required=True, help="被験者ID（例: C1） ※.mat不要")
+    ap.add_argument("--out_dir", default="out_subject_check", help="出力フォルダ")
+    ap.add_argument("--labels_key", default="", help="LABELS.mat の変数名を指定したいとき（空なら自動）")
+    ap.add_argument("--sat_key", default="", help="SAT.mat の変数名を指定したいとき（空なら自動）")
+    ap.add_argument("--rr_key", default="", help="RR.mat の変数名を指定したいとき（空なら自動）")
+    args = ap.parse_args()
+
+    root = Path(args.root)
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    labels_dir = root / "LABELS"
+    sat_dir = root / "SAT"
+    rr_dir = root / "RR"
+
+    subj = args.subject
+    if subj.lower().endswith(".mat"):
+        subj = subj[:-4]
+    fname = f"{subj}.mat"
+
+    labels_path = labels_dir / fname
+    sat_path = sat_dir / fname
+    rr_path = rr_dir / fname
+
+    if not labels_path.exists():
+        raise FileNotFoundError(f"見つかりません: {labels_path}")
+    if not sat_path.exists():
+        raise FileNotFoundError(f"見つかりません: {sat_path}")
+    if not rr_path.exists():
+        raise FileNotFoundError(f"見つかりません: {rr_path}")
+
+    print("[FILES]")
+    print("  LABELS:", labels_path)
+    print("  SAT   :", sat_path)
+    print("  RR    :", rr_path)
+
+    # 変数名ヒント
+    labels_pref = [args.labels_key] if args.labels_key else ["labels", "label", "LABELS", "apnea", "y", "Y"]
+    sat_pref = [args.sat_key] if args.sat_key else ["sat", "SAT", "spo2", "SpO2", "SPO2", "oximetry"]
+    rr_pref = [args.rr_key] if args.rr_key else ["rr", "RR", "rri", "RRI", "rr_ms"]
+
+    labels_raw = load_mat_numeric_1d(labels_path, preferred_keys=labels_pref)
+    sat_raw = load_mat_numeric_1d(sat_path, preferred_keys=sat_pref)
+    rr_raw = load_mat_numeric_1d(rr_path, preferred_keys=rr_pref)
+
+    labels = normalize_labels(labels_raw)
+    n_minutes = len(labels)
+
+    spo2_per_min = series_to_per_min_mean(sat_raw, n_minutes)
+    hr_per_min = rr_to_hr
+
+
+
+
+
+
+
+
+
+
