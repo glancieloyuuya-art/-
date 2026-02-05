@@ -1,0 +1,88 @@
+============================================================
+ Group-wise subject split (file-level) : 2/3 train, 1/3 test
+============================================================
+[INFO] in_dir         : /Users/yuuya/Desktop/HuGCDN2014-OXI/out
+[INFO] pattern        : *_merged.csv
+[INFO] seed           : 0
+[INFO] result_dir     : /Users/yuuya/Desktop/HuGCDN2014-OXI/out/result
+[INFO] fixed threshold: 0.5
+[INFO] LogReg C       : 1.0
+[INFO] threshold_mode : fixed
+[INFO] auto_C         : False
+[INFO] val_frac       : 0.2
+[SPLIT] C: total=38  train=25  test=13
+        train: C10, C11, C15, C16, C17, C18, C19, C21, C22, C23, C24, C25, C27, C28, C33, C34, C35, C36, C37, C38, C3, C5, C6, C7, C9
+        test : C12, C13, C14, C1, C20, C26, C29, C2, C30, C31, C32, C4, C8
+[SPLIT] D: total=34  train=22  test=12
+        train: D10, D11, D13, D16, D19, D20, D21, D22, D24, D26, D27, D28, D29, D2, D30, D32, D33, D34, D4, D5, D6, D9
+        test : D12, D14, D15, D17, D18, D1, D23, D25, D31, D3, D7, D8
+[SPLIT] ND: total=11  train=7  test=4
+        train: ND10, ND1, ND2, ND3, ND7, ND8, ND9
+        test : ND11, ND4, ND5, ND6
+
+[INFO] loading train files ...
+[INFO] loading test files ...
+
+============================================================
+ Data summary
+============================================================
+[INFO] features used (84): ['spo2_mean_pct', 'hr_mean_1m', 'spo2_min_pct', 'spo2_max_pct', 'spo2_range', 'rr_mean_ms', 'rr_std_ms', 'rr_min_ms', 'rr_max_ms', 'rr_cv', 'rr_range', 'spo2_diff_1m', 'hr_diff_1m', 'spo2_accel', 'hr_accel', 'spo2_drop10_mean', 'hr_rise10_mean', 'spo2_drop10_pos', 'spo2_drop10_pos_sq', 'spo2_le_90', 'spo2_le_92', 'desat3', 'desat4', 'desat3_count_10', 'desat3_count_30', 'desat4_count_30', 'desat_area_10', 'desat_area_30', 'desat3_runlen_prev', 'mins_since_desat3_prev', 'spo2_drop10_pos_lag1', 'spo2_drop10_pos_lag2', 'spo2_drop10_pos_lag3', 'hr_rise10_mean_lag1', 'hr_rise10_mean_lag2', 'hr_rise10_mean_lag3', 'hr_diff_1m_lag1', 'hr_diff_1m_lag2', 'hr_diff_1m_lag3', 'drop_x_rise', 'desat3_x_rise', 'spo2le90_x_rise', 'spo2_fall_then_rise', 'hr_rise_then_fall', 'spo2_roll_mean_5', 'spo2_roll_std_5', 'spo2_roll_min_5', 'spo2_roll_max_5', 'hr_roll_mean_5', 'hr_roll_std_5', 'hr_roll_min_5', 'hr_roll_max_5', 'spo2_z_5', 'hr_z_5', 'spo2_roll_mean_10', 'spo2_roll_std_10', 'spo2_roll_min_10', 'spo2_roll_max_10', 'hr_roll_mean_10', 'hr_roll_std_10', 'hr_roll_min_10', 'hr_roll_max_10', 'spo2_z_10', 'hr_z_10', 'spo2_roll_mean_20', 'spo2_roll_std_20', 'spo2_roll_min_20', 'spo2_roll_max_20', 'hr_roll_mean_20', 'hr_roll_std_20', 'hr_roll_min_20', 'hr_roll_max_20', 'spo2_z_20', 'hr_z_20', 'spo2_roll_mean_30', 'spo2_roll_std_30', 'spo2_roll_min_30', 'spo2_roll_max_30', 'hr_roll_mean_30', 'hr_roll_std_30', 'hr_roll_min_30', 'hr_roll_max_30', 'spo2_z_30', 'hr_z_30']
+[INFO] train rows(after dropna): 17486   label_counts={0: 12929, 1: 4557}
+[INFO] test  rows(after dropna): 9171    label_counts={0: 6461, 1: 2710}
+
+============================================================
+ Overall result (ALL TEST files merged)
+============================================================
+✅ 正答率(Accuracy): 85.18%  (7812/9171)
+✅ threshold used   : 0.500
+✅ C used           : 1.0
+📈 AUC(ROC): 0.9122
+
+Confusion Matrix (rows=true, cols=pred)
+          pred0   pred1
+true0      5475    986
+true1       373   2337
+
+              precision    recall  f1-score   support
+
+           0     0.9362    0.8474    0.8896      6461
+           1     0.7033    0.8624    0.7747      2710
+
+    accuracy                         0.8518      9171
+   macro avg     0.8197    0.8549    0.8322      9171
+weighted avg     0.8674    0.8518    0.8557      9171
+
+============================================================
+ Export TEST judgments per file -> result/*.csv
+============================================================
+[OK]   C1 (C) rows= 235  acc= 96.60%  auc=0.6118  -> C1_test_pred.csv
+[OK]  C12 (C) rows= 365  acc= 95.89%  auc=0.9478  -> C12_test_pred.csv
+[OK]  C13 (C) rows= 410  acc= 97.32%  auc=0.9058  -> C13_test_pred.csv
+[OK]  C14 (C) rows= 319  acc= 94.98%  auc=0.8176  -> C14_test_pred.csv
+[OK]   C2 (C) rows= 394  acc= 89.34%  auc=0.7484  -> C2_test_pred.csv
+[OK]  C20 (C) rows= 403  acc= 95.04%  auc=0.7830  -> C20_test_pred.csv
+[OK]  C26 (C) rows= 352  acc= 86.08%  auc=0.8974  -> C26_test_pred.csv
+[OK]  C29 (C) rows= 387  acc= 90.18%  auc=0.6364  -> C29_test_pred.csv
+[OK]  C30 (C) rows= 296  acc= 96.96%  auc=0.7847  -> C30_test_pred.csv
+[OK]  C31 (C) rows= 276  acc= 92.39%  auc=0.8661  -> C31_test_pred.csv
+[OK]  C32 (C) rows= 320  acc= 98.12%  auc=0.7876  -> C32_test_pred.csv
+[OK]   C4 (C) rows= 402  acc= 93.53%  auc=0.7795  -> C4_test_pred.csv
+[OK]   C8 (C) rows= 300  acc= 97.67%  auc=0.7306  -> C8_test_pred.csv
+[OK]   D1 (D) rows= 430  acc= 77.67%  auc=0.8970  -> D1_test_pred.csv
+[OK]  D12 (D) rows= 406  acc= 76.35%  auc=0.9095  -> D12_test_pred.csv
+[OK]  D14 (D) rows= 187  acc= 92.51%  auc=0.8198  -> D14_test_pred.csv
+[OK]  D15 (D) rows= 155  acc= 89.68%  auc=0.7851  -> D15_test_pred.csv
+[OK]  D17 (D) rows= 388  acc= 70.10%  auc=0.8611  -> D17_test_pred.csv
+[OK]  D18 (D) rows= 368  acc= 86.41%  auc=0.8949  -> D18_test_pred.csv
+[OK]  D23 (D) rows= 143  acc= 82.52%  auc=0.5809  -> D23_test_pred.csv
+[OK]  D25 (D) rows= 370  acc= 84.32%  auc=0.8855  -> D25_test_pred.csv
+[OK]   D3 (D) rows= 156  acc= 95.51%  auc=0.6232  -> D3_test_pred.csv
+[OK]  D31 (D) rows= 389  acc= 71.72%  auc=0.7749  -> D31_test_pred.csv
+[OK]   D7 (D) rows= 378  acc= 66.14%  auc=0.8226  -> D7_test_pred.csv
+[OK]   D8 (D) rows= 208  acc= 84.13%  auc=0.9156  -> D8_test_pred.csv
+[OK] ND11 (ND) rows= 421  acc= 66.75%  auc=0.7452  -> ND11_test_pred.csv
+[OK]  ND4 (ND) rows= 243  acc= 72.43%  auc=0.7654  -> ND4_test_pred.csv
+[OK]  ND5 (ND) rows=  80  acc= 66.25%  auc=0.7085  -> ND5_test_pred.csv
+[OK]  ND6 (ND) rows= 390  acc= 72.31%  auc=0.7235  -> ND6_test_pred.csv
+[OK] saved per-file summary: /Users/yuuya/Desktop/HuGCDN2014-OXI/out/result/test_summary_by_file.csv
+[OK] saved model: /Users/yuuya/Desktop/HuGCDN2014-OXI/out/logreg_apnea_model.joblib
