@@ -1,0 +1,94 @@
+============================================================
+ Group-wise subject split (file-level) : 2/3 train, 1/3 test
+  + GBDT model (LightGBM / XGBoost / CatBoost)
+============================================================
+[INFO] algo        : lgbm
+[INFO] in_dir      : /Users/yuuya/Desktop/HuGCDN2014-OXI/out
+[INFO] pattern     : *_merged.csv
+[INFO] seed        : 0
+[INFO] threshold   : 0.5
+[INFO] result_dir  : /Users/yuuya/Desktop/HuGCDN2014-OXI/out/result
+[INFO] balanced_weight : True
+[SPLIT] C: total=38  train=25  test=13
+        train: C10, C11, C15, C16, C17, C18, C19, C21, C22, C23, C24, C25, C27, C28, C33, C34, C35, C36, C37, C38, C3, C5, C6, C7, C9
+        test : C12, C13, C14, C1, C20, C26, C29, C2, C30, C31, C32, C4, C8
+[SPLIT] D: total=34  train=22  test=12
+        train: D10, D11, D13, D16, D19, D20, D21, D22, D24, D26, D27, D28, D29, D2, D30, D32, D33, D34, D4, D5, D6, D9
+        test : D12, D14, D15, D17, D18, D1, D23, D25, D31, D3, D7, D8
+[SPLIT] ND: total=11  train=7  test=4
+        train: ND10, ND1, ND2, ND3, ND7, ND8, ND9
+        test : ND11, ND4, ND5, ND6
+
+[INFO] loading train files ...
+[INFO] loading test files ...
+
+============================================================
+ Data summary
+============================================================
+[INFO] features used (11): ['spo2_mean_pct', 'hr_mean_1m', 'spo2_drop_from_baseline', 'hr_rise_from_baseline', 'spo2_diff_1m', 'hr_diff_1m', 'rr_std_ms', 'spo2_min_pct', 'spo2_max_pct', 'rr_min_ms', 'rr_max_ms']
+[INFO] train rows(after dropna): 21781   label_counts={0: 16943, 1: 4838}
+[INFO] test  rows(after dropna): 10756    label_counts={0: 7858, 1: 2898}
+
+============================================================
+ Overall result (ALL TEST files merged)
+============================================================
+✅ 正答率(Accuracy): 85.53%  (9200/10756)
+📈 AUC(ROC): 0.8927
+
+Confusion Matrix (rows=true, cols=pred)
+          pred0   pred1
+true0      7008    850
+true1       706   2192
+
+              precision    recall  f1-score   support
+
+           0     0.9085    0.8918    0.9001      7858
+           1     0.7206    0.7564    0.7380      2898
+
+    accuracy                         0.8553     10756
+   macro avg     0.8145    0.8241    0.8191     10756
+weighted avg     0.8579    0.8553    0.8564     10756
+
+============================================================
+ Export TEST judgments per file -> result/*.csv
+============================================================
+[OK]   C1 (C) rows= 302  acc= 95.03%  auc=0.7827  -> C1_test_pred.csv
+[OK]  C12 (C) rows= 431  acc= 95.82%  auc=0.9385  -> C12_test_pred.csv
+[OK]  C13 (C) rows= 442  acc= 92.76%  auc=0.8656  -> C13_test_pred.csv
+[OK]  C14 (C) rows= 433  acc= 96.07%  auc=0.8425  -> C14_test_pred.csv
+[OK]   C2 (C) rows= 424  acc= 91.51%  auc=0.6085  -> C2_test_pred.csv
+[OK]  C20 (C) rows= 433  acc= 91.69%  auc=0.8005  -> C20_test_pred.csv
+[OK]  C26 (C) rows= 414  acc= 90.82%  auc=0.8931  -> C26_test_pred.csv
+[OK]  C29 (C) rows= 420  acc= 95.71%  auc=0.9402  -> C29_test_pred.csv
+[OK]  C30 (C) rows= 435  acc= 97.24%  auc=0.8417  -> C30_test_pred.csv
+[OK]  C31 (C) rows= 405  acc= 94.57%  auc=0.8676  -> C31_test_pred.csv
+[OK]  C32 (C) rows= 429  acc= 97.44%  auc=0.8826  -> C32_test_pred.csv
+[OK]   C4 (C) rows= 436  acc= 90.14%  auc=0.4954  -> C4_test_pred.csv
+[OK]   C8 (C) rows= 433  acc= 98.85%  auc=0.7022  -> C8_test_pred.csv
+[OK]   D1 (D) rows= 460  acc= 80.00%  auc=0.8756  -> D1_test_pred.csv
+[OK]  D12 (D) rows= 436  acc= 78.67%  auc=0.9146  -> D12_test_pred.csv
+[OK]  D14 (D) rows= 217  acc= 90.78%  auc=0.9306  -> D14_test_pred.csv
+[OK]  D15 (D) rows= 185  acc= 83.78%  auc=0.8146  -> D15_test_pred.csv
+[OK]  D17 (D) rows= 418  acc= 76.32%  auc=0.8624  -> D17_test_pred.csv
+[OK]  D18 (D) rows= 398  acc= 88.44%  auc=0.9090  -> D18_test_pred.csv
+[OK]  D23 (D) rows= 173  acc= 77.46%  auc=0.6606  -> D23_test_pred.csv
+[OK]  D25 (D) rows= 400  acc= 82.25%  auc=0.8886  -> D25_test_pred.csv
+[OK]   D3 (D) rows= 186  acc= 93.01%  auc=0.7608  -> D3_test_pred.csv
+[OK]  D31 (D) rows= 419  acc= 70.64%  auc=0.7672  -> D31_test_pred.csv
+[OK]   D7 (D) rows= 408  acc= 69.85%  auc=0.8131  -> D7_test_pred.csv
+[OK]   D8 (D) rows= 238  acc= 77.73%  auc=0.8501  -> D8_test_pred.csv
+[OK] ND11 (ND) rows= 451  acc= 62.75%  auc=0.7104  -> ND11_test_pred.csv
+[OK]  ND4 (ND) rows= 289  acc= 67.13%  auc=0.7780  -> ND4_test_pred.csv
+[OK]  ND5 (ND) rows= 221  acc= 67.42%  auc=0.4761  -> ND5_test_pred.csv
+[OK]  ND6 (ND) rows= 420  acc= 72.38%  auc=0.8018  -> ND6_test_pred.csv
+[OK] saved per-file summary: /Users/yuuya/Desktop/HuGCDN2014-OXI/out/result/test_summary_by_file.csv
+
+============================================================
+ Group-wise accuracy on TEST (ALL test rows merged)
+============================================================
+[GROUP C] rows= 5437  acc= 94.43%  auc=0.8147  label_counts={0: 5303, 1: 134}
+[GROUP D] rows= 3938  acc= 79.63%  auc=0.8765  label_counts={1: 2049, 0: 1889}
+[GROUP ND] rows= 1381  acc= 67.34%  auc=0.7437  label_counts={1: 715, 0: 666}
+
+[OK] saved model: /Users/yuuya/Desktop/HuGCDN2014-OXI/out/gbdt_apnea_model_lgbm.joblib
+[OK] saved feature importances: /Users/yuuya/Desktop/HuGCDN2014-OXI/out/result/feature_importance.csv

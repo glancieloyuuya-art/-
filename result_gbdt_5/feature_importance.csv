@@ -1,0 +1,12 @@
+feature,importance
+spo2_mean_pct,2077.0
+rr_std_ms,2074.0
+spo2_min_pct,1978.0
+hr_rise_from_baseline,1910.0
+rr_min_ms,1882.0
+hr_mean_1m,1801.0
+rr_max_ms,1784.0
+hr_diff_1m,1747.0
+spo2_drop_from_baseline,1556.0
+spo2_diff_1m,1516.0
+spo2_max_pct,1303.0
